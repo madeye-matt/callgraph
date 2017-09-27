@@ -1,4 +1,4 @@
-(ns callgraph.core-test
+(ns com.madeye.clojure.callgraph.core-test
   (:require [clojure.test :refer :all]
             [callgraph.core :refer :all]))
 

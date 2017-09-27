@@ -1,4 +1,4 @@
-(defproject callgraph "0.1.0-SNAPSHOT"
+(defproject com.madeye.clojure.callgraph "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,8 @@
   :dependencies [
                  [org.clojure/clojure "1.8.0"]
                  [de.ubercode.clostache/clostache "1.4.0"]
+                 [tuddman/neocons "3.2.0-SNAPSHOT"]
                 ]
-  :main ^:skip-aot callgraph.core
+  :main ^:skip-aot com.madeye.clojure.callgraph.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
