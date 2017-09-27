@@ -35,7 +35,7 @@
       "C" (parse-class line)
       nil)))
 
-(defn- load-data
+(defn load-data
   [cgfile]
   (let [calldata (str/split-lines (slurp cgfile))]
     (map parse-line calldata)))
@@ -52,22 +52,50 @@
   [method-name]
   (CGMethod. method-name))
 
+(defn get-class-from-callgraph
+  [cg class-name]
+  (get (:classes cg) (keyword class-name)))
+
 (defn add-method-to-class
   [cgclass method-name]
   (if (not (contains? (:methods cgclass) method-name))
     (assoc cgclass :methods (assoc (:methods cgclass) (keyword method-name) (create-method method-name)))
     cgclass))
 
-(defn add-method-to-callgraph
-  [cg class-name method-name])
-
 (defn add-class-to-callgraph
-  [cg class-name]
-  (if (not (contains? (:classes cg) class-name))
-    (assoc cg :classes (assoc (:classes cg) (keyword class-name) (create-class class-name)))))
+  [cg cgclass]
+  (assoc cg :classes (assoc (:classes cg) (keyword (:name cgclass)) cgclass)))
+
+(defn add-class-to-callgraph-if-not-exists
+  [cg cgclass]
+  (if (nil? (get-class-from-callgraph cg (:name cgclass)))
+    (assoc cg :classes (assoc (:classes cg) (keyword (:name cgclass)) cgclass))))
+
+(defn add-method-to-callgraph
+  [cg class-name method-name]
+  (let [existing (get-class-from-callgraph cg class-name)]
+    (if (not (nil? existing))
+      (add-class-to-callgraph cg (add-method-to-class existing method-name))
+      (add-class-to-callgraph cg (add-method-to-class (create-class class-name) method-name)))))
+
+(defn- process-callgraph-class-row
+  [cg row]
+  (-> cg
+      (add-class-to-callgraph-if-not-exists (create-class (:src-class row)))
+      (add-class-to-callgraph-if-not-exists (create-class (:dest-class row)))))
+
+(defn- process-callgraph-method-row
+  [cg row]
+  cg)
+
+(defn process-callgraph-row
+  [cg row]
+  (case (:type row)
+    :class (process-callgraph-class-row cg row)
+    :method (process-callgraph-method-row cg row)))
 
 (defn parse-callgraph
   [cgfile]
   (let [data (load-data cgfile)
         class-names (clojure.set/union (set (map :dest-class data)) (set (map :src-class data)))]
-    (reduce #(add-class-to-callgraph %1 %2) (create-callgraph) class-names)))
+    (reduce #(add-class-to-callgraph %1 (create-class %2)) (create-callgraph) class-names)))
