@@ -19,12 +19,8 @@
   [data]
   (filter-data :method data))
 
-(defn- render-class
-  [class-data root-class degrees]
-  )
-
 (defn- render-classgraph
-  [data root-class degrees filename]
+  [data filename]
   (let [class-data (filter-class data)
         template-data (hash-map :class-data class-data)
         output (render-resource "templates/class-graph.mustache" template-data)]
@@ -50,6 +46,6 @@
 )
 
 (defn -main
-  [cgfile & args]
+  [cgfile filename & args]
   (let [data (l/load-data cgfile)]
-    data))
+    (render-classgraph data filename)))
