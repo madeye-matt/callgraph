@@ -4,48 +4,20 @@
 (use 'clostache.parser)
 (require '[clojure.string :as str])
 (require '[com.madeye.clojure.callgraph.loader :as l])
+(require '[com.madeye.clojure.callgraph.template :as t])
+(require '[com.madeye.clojure.callgraph.filter :as f])
+(require '[clojurewerkz.neocons.rest :as nr])
+(require '[clojurewerkz.neocons.rest.nodes :as nn])
+(require '[clojurewerkz.neocons.rest.relationships :as nrl])
 
-(defn reload [] (use :reload-all 'callgraph.core))
+(defn reload [] (use :reload-all 'com.madeye.clojure.callgraph.core))
 
-(defn- filter-data
-  [type data]
-  (filter #(= (:type %) type) data))
-  
-(defn- filter-class
-  [data]
-  (filter-data :class data))
-  
-(defn- filter-method
-  [data]
-  (filter-data :method data))
-
-(defn- render-classgraph
-  [data filename]
-  (let [class-data (filter-class data)
-        template-data (hash-map :class-data class-data)
-        output (render-resource "templates/class-graph.mustache" template-data)]
-    (spit filename output)))
-
-(defn- reduce-class-map
-  [rec1 rec2]
-  (let [src-class (:src-class rec2)
-        dest-class (:dest-class rec2)
-        existing (get rec1 src-class)]
-    (if (not (nil? existing))
-      (assoc rec1 src-class (conj existing dest-class))
-      (assoc rec1 src-class (conj [] dest-class))
-    )
-  )
-)
-
-(defn- build-class-map
-  [data]
-  (let [class-data (filter-class data)]
-    (reduce reduce-class-map {} class-data)
-  )
-)
+(defn- connect-neo4j
+  [url]
+    (nr/connect url)) 
 
 (defn -main
-  [cgfile filename & args]
-  (let [data (l/load-data cgfile)]
-    (render-classgraph data filename)))
+  [config-file & args]
+  (let [config (read-string (slurp config-file))
+        data (l/load-data (:jcg-file config))]
+    (connect-neo4j (:neo4j-url config))))
