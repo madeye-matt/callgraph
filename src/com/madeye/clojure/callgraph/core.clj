@@ -2,6 +2,10 @@
   (:gen-class))
 
 (use 'clostache.parser)
+(require '[clojurewerkz.neocons.rest :as nr])
+(require '[clojurewerkz.neocons.rest.nodes :as nn])
+(require '[clojurewerkz.neocons.rest.labels :as nl])
+(require '[clojurewerkz.neocons.rest.relationships :as nrl])
 (require '[com.madeye.clojure.callgraph.loader :as l])
 (require '[com.madeye.clojure.callgraph.filter :as f])
 (require '[com.madeye.clojure.callgraph.neo4j :as n])
