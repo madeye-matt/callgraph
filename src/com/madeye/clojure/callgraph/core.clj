@@ -3,6 +3,7 @@
 
 (use 'clostache.parser)
 (require '[com.madeye.clojure.callgraph.loader :as l])
+(require '[com.madeye.clojure.callgraph.filter :as f])
 (require '[clojurewerkz.neocons.rest :as nr])
 
 (defn reload [] (use :reload-all 'com.madeye.clojure.callgraph.core))
