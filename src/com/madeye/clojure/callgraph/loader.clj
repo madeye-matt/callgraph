@@ -3,6 +3,7 @@
 
 (use 'clostache.parser)
 (require '[clojure.string :as str])
+(require '[clojure.set :as set])
 
 (defrecord Callgraph [classes])
 (defrecord CGClass [name methods])
@@ -69,7 +70,8 @@
 (defn add-class-to-callgraph-if-not-exists
   [cg cgclass]
   (if (nil? (get-class-from-callgraph cg (:name cgclass)))
-    (assoc cg :classes (assoc (:classes cg) (keyword (:name cgclass)) cgclass))))
+    (assoc cg :classes (assoc (:classes cg) (keyword (:name cgclass)) cgclass))
+    cg))
 
 (defn add-method-to-callgraph
   [cg class-name method-name]
@@ -94,8 +96,18 @@
     :class (process-callgraph-class-row cg row)
     :method (process-callgraph-method-row cg row)))
 
+(defn process-callgraph
+  [data]
+  (loop [remaining data cg (create-callgraph)]
+    (if (not (empty? remaining))
+      (do 
+        ;(println "remaining:" (count remaining) ",cg:" cg)
+        (recur (rest remaining) (process-callgraph-row cg (first remaining)))
+      )
+      cg)))
+
 (defn parse-callgraph
   [cgfile]
   (let [data (load-data cgfile)
-        class-names (clojure.set/union (set (map :dest-class data)) (set (map :src-class data)))]
+        class-names (set/union (set (map :dest-class data)) (set (map :src-class data)))]
     (reduce #(add-class-to-callgraph %1 (create-class %2)) (create-callgraph) class-names)))
