@@ -57,6 +57,11 @@
   [cg class-name]
   (get (:classes cg) (keyword class-name)))
 
+(defn get-method-from-callgraph
+  [cg class-name method-name]
+  (if-let [cgclass (get-class-from-callgraph cg class-name)]
+    (get (:methods cgclass) (keyword method-name))))
+
 (defn add-method-to-class
   [cgclass method-name]
   (if (not (contains? (:methods cgclass) method-name))
