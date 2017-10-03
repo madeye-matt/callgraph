@@ -12,6 +12,7 @@
 (require '[clojurewerkz.neocons.rest :as nr])
 (require '[taoensso.timbre :as timbre])
 (require '[taoensso.timbre.appenders.core :as appenders])
+(require '[clojure.core.async :as async :refer [go <!! chan alts! >!]])
 
 (timbre/refer-timbre)
 
@@ -25,5 +26,7 @@
   [config-file & args]
   (info "callgraph")
   (let [config (read-string (slurp config-file))
+        conn (nr/connect (:neo4j-url config))
         data (l/load-callgraph (:jcg-file config))]
-    (nr/connect (:neo4j-url config))))
+    (n/load-callgraph conn data)))
+    

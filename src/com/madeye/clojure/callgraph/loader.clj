@@ -7,7 +7,7 @@
 
 (defrecord Callgraph [classes])
 (defrecord CGClass [name methods])
-(defrecord CGMethod [name])
+(defrecord CGMethod [name class-name])
 
 (defn- parse-class
   [class-line]
@@ -50,8 +50,8 @@
   (CGClass. class-name {}))
 
 (defn create-method
-  [method-name]
-  (CGMethod. method-name))
+  [class-name method-name]
+  (CGMethod. method-name class-name))
 
 (defn get-class-from-callgraph
   [cg class-name]
@@ -65,7 +65,7 @@
 (defn add-method-to-class
   [cgclass method-name]
   (if (not (contains? (:methods cgclass) method-name))
-    (assoc cgclass :methods (assoc (:methods cgclass) (keyword method-name) (create-method method-name)))
+    (assoc cgclass :methods (assoc (:methods cgclass) (keyword method-name) (create-method (:name cgclass) method-name)))
     cgclass))
 
 (defn add-class-to-callgraph

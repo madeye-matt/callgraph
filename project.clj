@@ -8,6 +8,7 @@
                  [de.ubercode.clostache/clostache "1.4.0"]
                  [tuddman/neocons "3.2.0-SNAPSHOT"]
                  [com.taoensso/timbre "4.10.0"]
+                 [org.clojure/core.async "0.3.443"]
                 ]
   :main ^:skip-aot com.madeye.clojure.callgraph.core
   :target-path "target/%s"
