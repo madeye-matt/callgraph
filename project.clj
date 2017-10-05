@@ -12,4 +12,5 @@
                 ]
   :main ^:skip-aot com.madeye.clojure.callgraph.core
   :target-path "target/%s"
+  :jvm-opts ["-Dclojure.core.async.pool-size=16"]
   :profiles {:uberjar {:aot :all}})

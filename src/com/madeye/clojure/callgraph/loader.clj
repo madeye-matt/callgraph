@@ -5,7 +5,7 @@
 (require '[clojure.string :as str])
 (require '[clojure.set :as set])
 
-(defrecord Callgraph [classes])
+(defrecord Callgraph [classes dependencies])
 (defrecord CGClass [name methods])
 (defrecord CGMethod [name class-name])
 
@@ -43,7 +43,7 @@
 
 (defn create-callgraph
   []
-  (Callgraph. {}))
+  (Callgraph. {} []))
 
 (defn create-class
   [class-name]
@@ -108,15 +108,9 @@
   (loop [remaining data cg (create-callgraph)]
     (if (not (empty? remaining))
       (recur (rest remaining) (process-callgraph-row cg (first remaining)))
-      cg)))
+      (assoc cg :dependencies data))))
 
 (defn load-callgraph
   [cgfile]
   (let [data (load-data cgfile)]
         (process-callgraph data)))
-
-;(defn load-callgraph
-;  [cgfile]
-;  (let [data (load-data cgfile)
-;        class-names (set/union (set (map :dest-class data)) (set (map :src-class data)))]
-;    (reduce #(add-class-to-callgraph %1 (create-class %2)) (create-callgraph) class-names)))
